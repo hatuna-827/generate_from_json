@@ -1,8 +1,8 @@
-let obj = { list: [] }
-for (let i = 1; i < 30; i++) {
-    obj.list.push({ index: i })
-}
-console.log(JSON.stringify(obj))
+// let obj = { list: [] }
+// for (let i = 1; i < 30; i++) {
+//     obj.list.push({ index: i })
+// }
+// console.log(JSON.stringify(obj))
 
 "use strict"
 import data from "./data.json" with {type: "json"}

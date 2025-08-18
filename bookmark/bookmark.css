@@ -1,0 +1,50 @@
+@media screen and (min-width:650px) {
+    :root {
+        --font-size: 15px;
+        --line-size: 20px;
+        --nest-size: 30px;
+    }
+
+    #main {
+        margin: 50px;
+        text-align: center;
+    }
+
+    h1 {
+        margin: 30px 0px;
+        line-height: 50px;
+        color: var(--black-color);
+        font-size: 45px;
+    }
+
+    #generate_box {
+        text-align: left;
+        padding: 0px 100px;
+    }
+
+    a {
+        text-decoration: none;
+        color: var(--black-color);
+        line-height: var(--line-size);
+        font-size: var(--font-size);
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    details {
+        padding: 0px var(--nest-size);
+        color: var(--black-color);
+        line-height: var(--line-size);
+        font-size: var(--font-size);
+    }
+
+    details:open>summary {
+        background-color: var(--grey-green-color);
+    }
+
+    summary {
+        margin-left: calc(var(--nest-size)*-1);
+    }
+}
