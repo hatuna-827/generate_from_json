@@ -1,36 +1,36 @@
 {
-   "roots": {
-      "bookmark_bar": {
-         "children": [
-            {
-               "children": [
-                  {
-                     "name": "Google翻訳",
-                     "type": "url",
-                     "url": "https://translate.google.co.jp"
-                  },
-                  {
-                     "name": "DeepL翻訳",
-                     "type": "url",
-                     "url": "https://www.deepl.com/ja/translator"
-                  },
-                  {
-                     "name": "YouTube",
-                     "type": "url",
-                     "url": "https://www.youtube.com/"
-                  }
-               ],
-               "name": "folder",
-               "type": "folder"
-            },
-            {
-               "name": "GitHub",
-               "type": "url",
-               "url": "https://github.com/"
-            }
-         ],
-         "name": "ブックマーク バー",
-         "type": "folder"
-      }
-   }
+	"roots": {
+		"bookmark_bar": {
+			"children": [
+				{
+					"children": [
+						{
+							"name": "Google翻訳",
+							"type": "url",
+							"url": "https://translate.google.co.jp"
+						},
+						{
+							"name": "DeepL翻訳",
+							"type": "url",
+							"url": "https://www.deepl.com/ja/translator"
+						},
+						{
+							"name": "YouTube",
+							"type": "url",
+							"url": "https://www.youtube.com/"
+						}
+					],
+					"name": "folder",
+					"type": "folder"
+				},
+				{
+					"name": "GitHub",
+					"type": "url",
+					"url": "https://github.com/"
+				}
+			],
+			"name": "ブックマーク バー",
+			"type": "folder"
+		}
+	}
 }
