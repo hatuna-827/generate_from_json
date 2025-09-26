@@ -15,6 +15,8 @@ if (localStorage.hasOwnProperty("wordbook")) {
 	]
 }
 const generate_box = document.getElementById("generate_box")
+let dots_menu_remove_queue = []
+let dots_menu_remove_index = 0
 let dots_hover = false
 let title_move_hover = false
 let hover_index = -1
@@ -80,6 +82,8 @@ function title_click() {
 			document.getElementById(`title${hover_index}`).appendChild(new_dots_menu)
 			remove_dots_menu(dots_menu)
 		}
+	} else if (title_move_hover) {
+		// title_move
 	} else {
 		// open_wordbook
 		hide_dots_menu()
@@ -109,7 +113,15 @@ function remove_dots_menu(dots_menu) {
 	new_dots_menu.className = "ignore"
 	dots_menu.insertAdjacentElement('afterend', new_dots_menu)
 	dots_menu.remove()
+	new_dots_menu.dataset.remove_index = dots_menu_remove_index
+	dots_menu_remove_queue.push(dots_menu_remove_index)
+	dots_menu_remove_index++
 	window.setTimeout(() => {
-		new_dots_menu.remove()
+		document.querySelectorAll('.ignore').forEach((ignore) => {
+			if (ignore.dataset.remove_index == dots_menu_remove_queue[0]) {
+				ignore.remove()
+			}
+		})
+		dots_menu_remove_queue.shift()
 	}, 500)
 }
