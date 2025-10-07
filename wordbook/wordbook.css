@@ -6,6 +6,7 @@
 }
 
 #main {
+	position: relative;
 	margin: var(--main-margin);
 	text-align: center;
 }
@@ -17,21 +18,42 @@ h1 {
 	font-size: 45px;
 }
 
+#back {
+	position: absolute;
+	display: none;
+	top: 0px;
+	left: 0px;
+	font-size: 20px;
+	cursor: pointer;
+}
+
+#back_text {
+	display: inline;
+	opacity: 0;
+	transition: all 0.2s;
+}
+
+#back:hover>#back_text {
+	opacity: 1;
+	transition: all 0.2s;
+}
+
 #generate_box {
-	text-align: center;
+	justify-items: center;
 }
 
 .title_block {
 	margin: var(--title-block-margin);
 	background-color: var(--grey-d-color);
 	padding: 0px;
-	display: inline-block;
+	display: block;
 	position: relative;
 	line-height: 50px;
 	height: 50px;
 	width: var(--title-width);
 	border-radius: 10px;
 	font-size: 30px;
+	cursor: pointer;
 }
 
 #add_button {
@@ -49,16 +71,22 @@ h1 {
 	width: 50px;
 	font-size: 30px;
 	opacity: 0;
-	transition: all 0.1s;
+	transition: all 0.2s;
+	cursor: grab;
 }
 
-.title_move:hover {
+#generate_box:has(.dragging)>.dragging>.title_move,
+#generate_box:not(:has(.dragging))>.title_block:hover>.title_move {
 	opacity: 0.3;
-	transition: all 0.1s;
+	transition: all 0.2s;
 }
 
 .title_move::before {
 	content: "\21C5";
+}
+
+.dragging {
+	opacity: 0.5;
 }
 
 .dots {

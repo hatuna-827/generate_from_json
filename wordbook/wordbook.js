@@ -14,17 +14,63 @@ if (localStorage.hasOwnProperty("wordbook")) {
 		}
 	]
 }
-const generate_box = document.getElementById("generate_box")
 const main_title = document.getElementById("main_title")
+const back = document.getElementById("back")
+const generate_box = document.getElementById("generate_box")
 let dots_hover = false
 let title_move_hover = false
 let dots_menu_hover = false
 let hover_index = -1
+let dragEl = null
 display_title()
+
+generate_box.addEventListener("dragstart", (e) => {
+	if (e.target.classList && e.target.classList.contains("title_move")) {
+		dragEl = e.target.closest(".title_block")
+		dragEl.classList.add("dragging")
+		e.dataTransfer.effectAllowed = "move"
+		e.dataTransfer.setDragImage(new Image(), 0, 0)
+	} else {
+		e.preventDefault()
+	}
+})
+generate_box.addEventListener("dragend", (e) => {
+	if (!dragEl) return
+	const afterIndex = getDragAfterElement(generate_box, e.clientY).index
+	const [data] = wordbook_data.splice(dragEl.dataset.index, 1)
+	wordbook_data.splice(afterIndex, 0, data)
+	display_title()
+	dragEl.classList.remove("dragging")
+	dragEl = null
+})
+generate_box.addEventListener("dragover", (e) => {
+	e.preventDefault()
+	if (!dragEl) return
+	const afterElement = getDragAfterElement(generate_box, e.clientY).element
+	generate_box.insertBefore(dragEl, afterElement)
+	generate_box.appendChild(document.getElementById('add_button'))
+})
+function getDragAfterElement(container, y) {
+	const elements = [...container.querySelectorAll(".title_block:not(.dragging)")]
+	return elements.reduce(
+		(closest, child, i) => {
+			const size = child.getBoundingClientRect()
+			const offset = y - size.top - size.height / 2
+			if (offset < 0 && offset > closest.offset) {
+				return { offset: offset, element: child, index: i }
+			} else {
+				return closest
+			}
+		},
+		{ offset: Number.NEGATIVE_INFINITY, index: wordbook_data.length }
+	)
+}
 
 function open_wordbook(index) {
 	console.log("open_wordbook", wordbook_data[index])
 	main_title.textContent = wordbook_data[index].name
+	back.style.display = "block"
+	back.onclick = display_title
 	generate_box.innerHTML = ""
 	wordbook_data[index].words.forEach((word, i) => {
 		console.log(`No.${i} ${word.word} -> ${word.description}`)
@@ -33,6 +79,7 @@ function open_wordbook(index) {
 
 function display_title() {
 	main_title.textContent = "デジタル単語帳"
+	back.style.display = "none"
 	generate_box.innerHTML = ""
 	wordbook_data.forEach((wordbook, i) => {
 		const title = document.createElement("div")
@@ -51,10 +98,10 @@ function display_title() {
 		title_move.className = "title_move"
 		title_move.addEventListener('mouseover', () => { title_move_hover = true })
 		title_move.addEventListener('mouseleave', () => { title_move_hover = false })
+		title_move.draggable = true
 		title.appendChild(title_move)
 		title.appendChild(dots)
 		generate_box.appendChild(title)
-		generate_box.appendChild(document.createElement('br'))
 	})
 	// add add_button
 	const add_button = document.createElement("div")
@@ -67,6 +114,8 @@ function display_title() {
 function display_words(index) {
 	main_title.textContent = wordbook_data[index].name
 	generate_box.innerHTML = ""
+	back.style.display = "block"
+	back.onclick = display_title
 	const words_list_table = document.createElement('table')
 	words_list_table.id = "words_list_table"
 	const line = document.createElement('tr')
@@ -79,9 +128,9 @@ function display_words(index) {
 	th_no.textContent = "No."
 	th_word.textContent = "単語"
 	th_description.textContent = "説明"
-	th_no.scope="col"
-	th_word.scope="col"
-	th_description.scope="col"
+	th_no.scope = "col"
+	th_word.scope = "col"
+	th_description.scope = "col"
 	line.appendChild(th_no)
 	line.appendChild(th_word)
 	line.appendChild(th_description)
@@ -126,7 +175,21 @@ function title_click() {
 			dots_menu.addEventListener('mouseover', () => { dots_menu_hover = true })
 			dots_menu.addEventListener('mouseleave', () => { dots_menu_hover = false })
 			title_remove.addEventListener('click', () => {
-				delete wordbook_data[this.dataset.index]
+				dialog({ title: "注意", content: "削除します。よろしいですか?", button: ["キャンセル", "削除"] }).then((resolve) => {
+					console.log(resolve)
+					if (resolve == 1) {
+						delete wordbook_data[this.dataset.index]
+						display_title()
+					}
+				})
+			})
+			title_edit.addEventListener('click', () => {
+				let new_title_name = ""
+				new_title_name = window.prompt("単語帳の名前を入力してください。", "")
+				while (!/\S+/.test(new_title_name) || new_title_name == "") {
+					new_title_name = window.prompt("入力が無効です。", "")
+				}
+				if (new_title_name != null) { wordbook_data[this.dataset.index].name = new_title_name }
 				display_title()
 			})
 			words_list.addEventListener('click', () => {
@@ -153,7 +216,6 @@ function add_new_title() {
 	while (!/\S+/.test(new_title_name) || new_title_name == "") {
 		new_title_name = window.prompt("入力が無効です。", "")
 	}
-	if (new_title_name == null) { return }
-	wordbook_data.push({ name: new_title_name, words: [] })
+	if (new_title_name != null) { wordbook_data.push({ name: new_title_name, words: [] }) }
 	display_title()
 }
