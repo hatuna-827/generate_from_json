@@ -18,7 +18,6 @@ const main_title = document.getElementById("main_title")
 const back = document.getElementById("back")
 const generate_box = document.getElementById("generate_box")
 let dots_hover = false
-let title_move_hover = false
 let dots_menu_hover = false
 let hover_index = -1
 let dragEl = null
@@ -96,8 +95,6 @@ function display_title() {
 		dots.addEventListener('mouseleave', () => { dots_hover = false })
 		const title_move = document.createElement("div")
 		title_move.className = "title_move"
-		title_move.addEventListener('mouseover', () => { title_move_hover = true })
-		title_move.addEventListener('mouseleave', () => { title_move_hover = false })
 		title_move.draggable = true
 		title.appendChild(title_move)
 		title.appendChild(dots)
@@ -201,11 +198,8 @@ function title_click() {
 			dots_menu.appendChild(title_remove)
 			document.getElementById(`title${hover_index}`).appendChild(dots_menu)
 		}
-	} else if (title_move_hover) {
-		// title_move
 	} else if (!dots_menu_hover) {
 		// open_wordbook
-		console.log("-----------open_wordbook", hover_index)
 		open_wordbook(hover_index)
 	}
 }

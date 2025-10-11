@@ -132,25 +132,44 @@ h1 {
 }
 
 #words_list_table {
+	display: block;
+	width: 100%;
 	font-size: 20px;
 	border-collapse: collapse;
+	overflow-x: scroll;
+	scrollbar-width: thin;
+	border: 1px solid black;
+	box-sizing: content-box;
+	scrollbar-color: var(--leaf-green-color) var(--main-bg-color);
+
+	tr {
+		border-bottom: 1px solid black;
+		box-sizing: border-box;
+	}
+
+	th {
+		box-sizing: border-box;
+	}
+
+	td {
+		box-sizing: border-box;
+	}
 
 	.no {
 		margin: 0px 10px;
-		width: 80px;
-		border-bottom: 1px solid black;
+		min-width: 50px;
 	}
 
 	.word {
 		margin: 0px;
-		width: 300px;
-		border-bottom: 1px solid black;
+		min-width: 200px;
+		border-left: 1px solid black;
+		border-right: 1px solid black;
 	}
 
 	.description {
 		margin: 0px;
-		width: calc(100vw - var(--main-margin) - 380px);
+		min-width: calc(100vw - var(--main-margin)*2 - 250px);
 		text-align: left;
-		border-bottom: 1px solid black;
 	}
 }
