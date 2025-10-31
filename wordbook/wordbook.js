@@ -1,27 +1,46 @@
 "use strict"
-import storage from "https://hatuna-827.github.io/storage.js"
-import dialog from "https://hatuna-827.github.io/dialog.js"
-let wordbook_data = []
-if (localStorage.hasOwnProperty("wordbook")) {
-	wordbook_data = storage.ger("wordbook")
-	console.log(wordbook_data)
-} else {
-	wordbook_data = [
-		{
-			name: "使い方", words: [
-				{ completed: false, word: "新規作成", description: "aa" }
-			]
-		}
-	]
-}
+
+/* - import ------------------------------------------------------------------------------------ */
+
+import storage from "https://hatuna-827.github.io/module/storage.js"
+import dialog from "https://hatuna-827.github.io/module/dialog.js"
+
+/* - const ------------------------------------------------------------------------------------- */
+
+let wordbook_data = [
+	{
+		name: "使い方", words: [
+			{ word: "新規作成", description: "aa" },
+			{ word: "編集", description: "bb" },
+			{ word: "削除", description: "cc" }
+		]
+	}
+]
+
 const main_title = document.getElementById("main_title")
 const back = document.getElementById("back")
 const generate_box = document.getElementById("generate_box")
+
 let dots_hover = false
 let dots_menu_hover = false
 let hover_index = -1
+
 let dragEl = null
+
+let card_data = { book: { index: 0, name: "", lenght: 0 }, card_index: 0, word: true }
+
+/* - init -------------------------------------------------------------------------------------- */
+
+if (storage.get("wordbook")) {
+	wordbook_data = [
+		...wordbook_data,
+		...storage.get("wordbook")
+	]
+}
+
 display_title()
+
+/* - add eventListener ------------------------------------------------------------------------- */
 
 generate_box.addEventListener("dragstart", (e) => {
 	if (e.target.classList && e.target.classList.contains("title_move")) {
@@ -33,6 +52,7 @@ generate_box.addEventListener("dragstart", (e) => {
 		e.preventDefault()
 	}
 })
+
 generate_box.addEventListener("dragend", (e) => {
 	if (!dragEl) return
 	const afterIndex = getDragAfterElement(generate_box, e.clientY).index
@@ -42,6 +62,7 @@ generate_box.addEventListener("dragend", (e) => {
 	dragEl.classList.remove("dragging")
 	dragEl = null
 })
+
 generate_box.addEventListener("dragover", (e) => {
 	e.preventDefault()
 	if (!dragEl) return
@@ -49,6 +70,9 @@ generate_box.addEventListener("dragover", (e) => {
 	generate_box.insertBefore(dragEl, afterElement)
 	generate_box.appendChild(document.getElementById('add_button'))
 })
+
+/* - function ---------------------------------------------------------------------------------- */
+
 function getDragAfterElement(container, y) {
 	const elements = [...container.querySelectorAll(".title_block:not(.dragging)")]
 	return elements.reduce(
@@ -65,15 +89,43 @@ function getDragAfterElement(container, y) {
 	)
 }
 
+function update_card() {
+	if (card_data.book.lenght <= card_data.card_index) {
+		display_title()
+		return
+	}
+	const card = document.getElementById("card")
+	let text = wordbook_data[card_data.book.index].words[card_data.card_index]
+	if (card_data.word) {
+		text = text.word
+	} else {
+		text = text.description
+	}
+	card.textContent = text
+}
+
+function next_card() {
+	if (card_data.word) {
+		card_data.word = false
+	} else {
+		card_data.word = true
+		++card_data.card_index
+	}
+	update_card()
+}
+
 function open_wordbook(index) {
-	console.log("open_wordbook", wordbook_data[index])
-	main_title.textContent = wordbook_data[index].name
+	const book = wordbook_data[index]
+	main_title.textContent = book.name
 	back.style.display = "block"
 	back.onclick = display_title
 	generate_box.innerHTML = ""
-	wordbook_data[index].words.forEach((word, i) => {
-		console.log(`No.${i} ${word.word} -> ${word.description}`)
-	})
+	card_data = { book: { index: index, name: book.name, lenght: book.words.length }, card_index: 0, word: true }
+	const card = document.createElement('div')
+	card.id = "card"
+	card.addEventListener('click', next_card)
+	generate_box.appendChild(card)
+	update_card()
 }
 
 function display_title() {
@@ -213,3 +265,5 @@ function add_new_title() {
 	if (new_title_name != null) { wordbook_data.push({ name: new_title_name, words: [] }) }
 	display_title()
 }
+
+/* --------------------------------------------------------------------------------------------- */

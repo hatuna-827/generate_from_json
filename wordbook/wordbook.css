@@ -173,3 +173,16 @@ h1 {
 		text-align: left;
 	}
 }
+
+#card{
+	display: flex;
+	height: 200px;
+	width: 500px;
+	justify-content: center;
+	align-items: center;
+	border-radius: 10px;
+	border: 1px solid var(--black-color);
+	font-size: 30px;
+	background-color: var(--white-color);
+	user-select: none;
+}
