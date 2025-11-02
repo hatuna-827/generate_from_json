@@ -105,10 +105,10 @@ h1 {
 	top: 0px;
 	right: -150px;
 	width: 130px;
-	background-color: white;
-	border: 1px solid gainsboro;
+	background-color: var(--white-color);
+	border: 1px solid var(--grey-d-color);
 	border-radius: 10px;
-	color: black;
+	color: var(--black-color);
 	font-size: 16px;
 	line-height: 25px;
 	overflow: hidden;
@@ -128,7 +128,7 @@ h1 {
 
 #title_remove::before {
 	content: "削除";
-	color: red;
+	color: var(--red-color);
 }
 
 #words_list_table {
@@ -138,12 +138,12 @@ h1 {
 	border-collapse: collapse;
 	overflow-x: scroll;
 	scrollbar-width: thin;
-	border: 1px solid black;
+	border: 1px solid var(--black-color);
 	box-sizing: content-box;
 	scrollbar-color: var(--leaf-green-color) var(--main-bg-color);
 
 	tr {
-		border-bottom: 1px solid black;
+		border-bottom: 1px solid var(--black-color);
 		box-sizing: border-box;
 	}
 
@@ -163,18 +163,19 @@ h1 {
 	.word {
 		margin: 0px;
 		min-width: 200px;
-		border-left: 1px solid black;
-		border-right: 1px solid black;
+		border-left: 1px solid var(--black-color);
+		border-right: 1px solid var(--black-color);
 	}
 
 	.description {
 		margin: 0px;
+		padding-left: 10px;
 		min-width: calc(100vw - var(--main-margin)*2 - 250px);
 		text-align: left;
 	}
 }
 
-#card{
+#card {
 	display: flex;
 	height: 200px;
 	width: 500px;
@@ -185,4 +186,11 @@ h1 {
 	font-size: 30px;
 	background-color: var(--white-color);
 	user-select: none;
+}
+
+#card>#front-word {
+	position: absolute;
+	color: var(--grey-5-color);
+	transform: translateY(-70px);
+	font-size: 20px;
 }
