@@ -210,6 +210,68 @@ function display_words(index) {
 	generate_box.appendChild(words_list_table)
 }
 
+function edit_words(index) {
+	main_title.textContent = wordbook_data[index].name
+	generate_box.innerHTML = ""
+	back.style.display = "block"
+	back.onclick = display_title
+	const words_list_table = document.createElement('table')
+	words_list_table.id = "words_list_table"
+	const line = document.createElement('tr')
+	const th_no = document.createElement('th')
+	const th_word = document.createElement('th')
+	const th_description = document.createElement('th')
+	th_no.className = "no"
+	th_word.className = "word"
+	th_description.className = "description"
+	th_no.textContent = "No."
+	th_word.textContent = "単語"
+	th_description.textContent = "説明"
+	th_no.scope = "col"
+	th_word.scope = "col"
+	th_description.scope = "col"
+	line.appendChild(th_no)
+	line.appendChild(th_word)
+	line.appendChild(th_description)
+	words_list_table.appendChild(line)
+	wordbook_data[index].words.forEach((word, i) => {
+		const line = document.createElement('tr')
+		const td_no = document.createElement('td')
+		const td_word = document.createElement('td')
+		const input_word = document.createElement('input')
+		const td_description = document.createElement('td')
+		const input_description = document.createElement('input')
+		td_no.className = "no"
+		td_word.className = "word"
+		td_description.className = "description"
+		td_no.scope = "row"
+		td_no.textContent = i + 1
+		input_word.value = word.word
+		input_description.value = word.description
+		input_word.addEventListener('input', function () {
+			wordbook_data[index].words[i].word = this.value
+		})
+		input_description.addEventListener('input', function () {
+			wordbook_data[index].words[i].description = this.value
+		})
+		td_word.appendChild(input_word)
+		td_description.appendChild(input_description)
+		line.appendChild(td_no)
+		line.appendChild(td_word)
+		line.appendChild(td_description)
+		words_list_table.appendChild(line)
+	})
+	generate_box.appendChild(words_list_table)
+	const add_new_word = document.createElement('button')
+	add_new_word.id = "add_new_word"
+	add_new_word.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="1.5"><path d="M3,12h18M12,3v18" /></svg>'
+	add_new_word.addEventListener('click', () => {
+		wordbook_data[index].words.push({ word: "", description: "" })
+		edit_words(index)
+	})
+	generate_box.appendChild(add_new_word)
+}
+
 function dots_click(e) {
 	e.stopPropagation()
 	if (document.querySelector(`#title${hover_index} #dots_menu`)) {
@@ -220,14 +282,27 @@ function dots_click(e) {
 		document.getElementById("dots_menu").remove()
 	}
 	const dots_menu = document.createElement('div')
-	const title_remove = document.createElement('div')
-	const title_edit = document.createElement('div')
 	const words_list = document.createElement('div')
+	const title_edit = document.createElement('div')
+	const words_edit = document.createElement('div')
+	const title_remove = document.createElement('div')
 	dots_menu.id = "dots_menu"
-	title_remove.id = "title_remove"
-	title_edit.id = "title_edit"
 	words_list.id = "words_list"
+	title_edit.id = "title_edit"
+	words_edit.id = "words_edit"
+	title_remove.id = "title_remove"
 	dots_menu.addEventListener('click', (e) => { e.stopPropagation() })
+	words_list.addEventListener('click', () => {
+		display_words(document.getElementById("dots_menu").parentElement.dataset.index)
+	})
+	title_edit.addEventListener('click', () => {
+		const new_title_name = input_new_title_name()
+		if (new_title_name != null) { wordbook_data[document.getElementById("dots_menu").parentElement.dataset.index].name = new_title_name }
+		display_title()
+	})
+	words_edit.addEventListener('click', () => {
+		edit_words(document.getElementById("dots_menu").parentElement.dataset.index)
+	})
 	title_remove.addEventListener('click', () => {
 		dialog({ title: "注意", content: "削除します。よろしいですか?", button: ["キャンセル", "削除"] }).then((resolve) => {
 			if (resolve == 1) {
@@ -236,16 +311,9 @@ function dots_click(e) {
 			}
 		})
 	})
-	title_edit.addEventListener('click', () => {
-		const new_title_name = input_new_title_name()
-		if (new_title_name != null) { wordbook_data[document.getElementById("dots_menu").parentElement.dataset.index].name = new_title_name }
-		display_title()
-	})
-	words_list.addEventListener('click', () => {
-		display_words(document.getElementById("dots_menu").parentElement.dataset.index)
-	})
 	dots_menu.appendChild(words_list)
 	dots_menu.appendChild(title_edit)
+	dots_menu.appendChild(words_edit)
 	dots_menu.appendChild(document.createElement('hr'))
 	dots_menu.appendChild(title_remove)
 	document.getElementById(`title${hover_index}`).appendChild(dots_menu)

@@ -126,6 +126,10 @@ h1 {
 	content: "名前の変更";
 }
 
+#words_edit::before {
+	content: "編集";
+}
+
 #title_remove::before {
 	content: "削除";
 	color: var(--red-color);
@@ -172,6 +176,30 @@ h1 {
 		padding-left: 10px;
 		min-width: calc(100vw - var(--main-margin)*2 - 250px);
 		text-align: left;
+	}
+
+	input {
+		padding: 0px;
+		height: 100%;
+		width: 100%;
+		font-size: 20px;
+		border: none;
+		background-color: var(--main-bg-color);
+		outline: none;
+	}
+}
+
+#add_new_word {
+	margin: 10px 0px;
+	height: 40px;
+	width: 200px;
+	border: none;
+	border-radius: 10px;
+	background-color: var(--main-color);
+	color: var(--white-color);
+
+	svg {
+		height: 100%;
 	}
 }
 
