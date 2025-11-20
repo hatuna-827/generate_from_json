@@ -3,11 +3,14 @@
 /* - import ------------------------------------------------------------------------------------ */
 
 import storage from "https://hatuna-827.github.io/module/storage.js"
+import obj_manip from "https://hatuna-827.github.io/module/obj_manip.js"
 import dialog from "https://hatuna-827.github.io/module/dialog.js"
 
 /* - const ------------------------------------------------------------------------------------- */
 
-let wordbook_data = [
+const storage_key = "wordbook"
+
+const default_wordbook_data = [
 	{
 		name: "使い方", words: [
 			{ word: "新規作成", description: "aa" },
@@ -17,21 +20,23 @@ let wordbook_data = [
 	}
 ]
 
-const main_title = document.getElementById("main_title")
+const load_data = storage.get(storage_key)
+
+const main_title = document.getElementById("main-title")
 const back = document.getElementById("back")
-const generate_box = document.getElementById("generate_box")
+const generate_box = document.getElementById("generate-box")
 
 let hover_index = -1
 let dragEl = null
-let card_data = { book: { index: 0, name: "", lenght: 0 }, card_index: 0, is_front: true }
+let card_data = { book: { index: 0, name: "", length: 0 }, card_index: 0, is_front: true }
+let wordbook_data
 
 /* - init -------------------------------------------------------------------------------------- */
 
-if (storage.get("wordbook")) {
-	wordbook_data = [
-		...wordbook_data,
-		...storage.get("wordbook")
-	]
+if (load_data !== null && load_data.length !== 0) {
+	wordbook_data = storage.get(storage_key)
+} else {
+	wordbook_data = default_wordbook_data
 }
 
 display_title()
@@ -39,8 +44,8 @@ display_title()
 /* - add eventListener ------------------------------------------------------------------------- */
 
 generate_box.addEventListener("dragstart", (e) => {
-	if (e.target.classList && e.target.classList.contains("title_move")) {
-		dragEl = e.target.closest(".title_block")
+	if (e.target.classList && e.target.classList.contains("title-move")) {
+		dragEl = e.target.closest(".title-block")
 		dragEl.classList.add("dragging")
 		e.dataTransfer.effectAllowed = "move"
 		e.dataTransfer.setDragImage(new Image(), 0, 0)
@@ -54,6 +59,7 @@ generate_box.addEventListener("dragend", (e) => {
 	const afterIndex = getDragAfterElement(generate_box, e.clientY).index
 	const [data] = wordbook_data.splice(dragEl.dataset.index, 1)
 	wordbook_data.splice(afterIndex, 0, data)
+	save_wordbook_data()
 	display_title()
 	dragEl.classList.remove("dragging")
 	dragEl = null
@@ -70,7 +76,7 @@ generate_box.addEventListener("dragover", (e) => {
 /* - function ---------------------------------------------------------------------------------- */
 
 function getDragAfterElement(container, y) {
-	const elements = [...container.querySelectorAll(".title_block:not(.dragging)")]
+	const elements = [...container.querySelectorAll(".title-block:not(.dragging)")]
 	return elements.reduce(
 		(closest, child, i) => {
 			const size = child.getBoundingClientRect()
@@ -86,7 +92,7 @@ function getDragAfterElement(container, y) {
 }
 
 function update_card() {
-	if (card_data.book.lenght <= card_data.card_index) {
+	if (card_data.book.length <= card_data.card_index) {
 		display_title()
 		return
 	}
@@ -120,7 +126,7 @@ function open_wordbook(index) {
 	back.style.display = "block"
 	back.onclick = display_title
 	generate_box.innerHTML = ""
-	card_data = { book: { index: index, name: book.name, lenght: book.words.length }, card_index: 0, is_front: true }
+	card_data = { book: { index: index, name: book.name, length: book.words.length }, card_index: 0, is_front: true }
 	const card = document.createElement('div')
 	card.id = "card"
 	card.addEventListener('click', next_card)
@@ -143,7 +149,7 @@ function display_title() {
 		const title = document.createElement("div")
 		title.id = `title${i}`
 		title.dataset.index = i
-		title.className = "title_block"
+		title.className = "title-block"
 		title.textContent = wordbook.name
 		title.addEventListener('click', () => { open_wordbook(hover_index) })
 		title.addEventListener('mouseover', () => { hover_index = i })
@@ -152,7 +158,7 @@ function display_title() {
 		dots.className = "dots"
 		dots.addEventListener('click', dots_click)
 		const title_move = document.createElement("div")
-		title_move.className = "title_move"
+		title_move.className = "title-move"
 		title_move.draggable = true
 		title.appendChild(title_move)
 		title.appendChild(dots)
@@ -160,8 +166,8 @@ function display_title() {
 	})
 	// add add_button
 	const add_button = document.createElement("div")
-	add_button.className = "title_block"
-	add_button.id = "add_button"
+	add_button.className = "title-block"
+	add_button.id = "add-button"
 	add_button.addEventListener('click', add_new_title)
 	generate_box.appendChild(add_button)
 }
@@ -172,7 +178,7 @@ function display_words(index) {
 	back.style.display = "block"
 	back.onclick = display_title
 	const words_list_table = document.createElement('table')
-	words_list_table.id = "words_list_table"
+	words_list_table.id = "words-list-table"
 	const line = document.createElement('tr')
 	const th_no = document.createElement('th')
 	const th_word = document.createElement('th')
@@ -215,58 +221,76 @@ function edit_words(index) {
 	generate_box.innerHTML = ""
 	back.style.display = "block"
 	back.onclick = display_title
-	const words_list_table = document.createElement('table')
-	words_list_table.id = "words_list_table"
-	const line = document.createElement('tr')
-	const th_no = document.createElement('th')
-	const th_word = document.createElement('th')
-	const th_description = document.createElement('th')
+	const words_list_table = document.createElement('div')
+	words_list_table.id = "words-edit-field"
+	const line = document.createElement('div')
+	line.className = "line title"
+	const th_no = document.createElement('div')
 	th_no.className = "no"
+	const th_word = document.createElement('div')
 	th_word.className = "word"
+	const th_description = document.createElement('div')
 	th_description.className = "description"
-	th_no.textContent = "No."
-	th_word.textContent = "単語"
-	th_description.textContent = "説明"
-	th_no.scope = "col"
-	th_word.scope = "col"
-	th_description.scope = "col"
 	line.appendChild(th_no)
 	line.appendChild(th_word)
 	line.appendChild(th_description)
 	words_list_table.appendChild(line)
-	wordbook_data[index].words.forEach((word, i) => {
-		const line = document.createElement('tr')
-		const td_no = document.createElement('td')
-		const td_word = document.createElement('td')
+	wordbook_data[index].words.forEach((word_content, i) => {
+		const line = document.createElement('div')
+		line.className = "line"
+		const no = document.createElement('div')
+		no.className = "no"
+		no.textContent = i + 1
+		const word = document.createElement('div')
+		word.className = "word"
 		const input_word = document.createElement('input')
-		const td_description = document.createElement('td')
-		const input_description = document.createElement('input')
-		td_no.className = "no"
-		td_word.className = "word"
-		td_description.className = "description"
-		td_no.scope = "row"
-		td_no.textContent = i + 1
-		input_word.value = word.word
-		input_description.value = word.description
+		input_word.className = "input"
+		input_word.value = word_content.word
 		input_word.addEventListener('input', function () {
 			wordbook_data[index].words[i].word = this.value
+			save_wordbook_data()
 		})
+		const description = document.createElement('div')
+		description.className = "description"
+		const input_description = document.createElement('input')
+		input_description.className = "input"
+		input_description.value = word_content.description
 		input_description.addEventListener('input', function () {
 			wordbook_data[index].words[i].description = this.value
+			save_wordbook_data()
 		})
-		td_word.appendChild(input_word)
-		td_description.appendChild(input_description)
-		line.appendChild(td_no)
-		line.appendChild(td_word)
-		line.appendChild(td_description)
+		const word_add = document.createElement('div')
+		word_add.className = "word-add"
+		word_add.addEventListener('click', function () {
+			wordbook_data[index].words.splice(i, 0, { word: "", description: "" })
+			save_wordbook_data()
+			edit_words(index)
+		})
+		fetch("https://hatuna-827.github.io/icons/xml/plus.xml").then(r => r.text()).then(svg => { word_add.innerHTML = svg })
+		const word_remove = document.createElement('div')
+		word_remove.className = "word-remove"
+		word_remove.addEventListener('click', function () {
+			wordbook_data[index].words.splice(i, 1)
+			save_wordbook_data()
+			edit_words(index)
+		})
+		fetch("https://hatuna-827.github.io/icons/xml/trash_can.xml").then(r => r.text()).then(svg => { word_remove.innerHTML = svg })
+		word.appendChild(input_word)
+		description.appendChild(input_description)
+		line.appendChild(word_add)
+		line.appendChild(word_remove)
+		line.appendChild(no)
+		line.appendChild(word)
+		line.appendChild(description)
 		words_list_table.appendChild(line)
 	})
 	generate_box.appendChild(words_list_table)
 	const add_new_word = document.createElement('button')
-	add_new_word.id = "add_new_word"
-	add_new_word.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="1.5"><path d="M3,12h18M12,3v18" /></svg>'
+	add_new_word.id = "add-new-word"
+	fetch("https://hatuna-827.github.io/icons/xml/plus.xml").then(r => r.text()).then(svg => { add_new_word.innerHTML = svg })
 	add_new_word.addEventListener('click', () => {
 		wordbook_data[index].words.push({ word: "", description: "" })
+		save_wordbook_data()
 		edit_words(index)
 	})
 	generate_box.appendChild(add_new_word)
@@ -275,38 +299,42 @@ function edit_words(index) {
 function dots_click(e) {
 	e.stopPropagation()
 	if (document.querySelector(`#title${hover_index} #dots_menu`)) {
-		document.getElementById("dots_menu").remove()
+		document.getElementById("dots-menu").remove()
 		return
 	}
-	if (document.getElementById("dots_menu")) {
-		document.getElementById("dots_menu").remove()
+	if (document.getElementById("dots-menu")) {
+		document.getElementById("dots-menu").remove()
 	}
 	const dots_menu = document.createElement('div')
 	const words_list = document.createElement('div')
 	const title_edit = document.createElement('div')
 	const words_edit = document.createElement('div')
 	const title_remove = document.createElement('div')
-	dots_menu.id = "dots_menu"
-	words_list.id = "words_list"
-	title_edit.id = "title_edit"
-	words_edit.id = "words_edit"
-	title_remove.id = "title_remove"
+	dots_menu.id = "dots-menu"
+	words_list.id = "words-list"
+	title_edit.id = "title-edit"
+	words_edit.id = "words-edit"
+	title_remove.id = "title-remove"
 	dots_menu.addEventListener('click', (e) => { e.stopPropagation() })
 	words_list.addEventListener('click', () => {
-		display_words(document.getElementById("dots_menu").parentElement.dataset.index)
+		display_words(document.getElementById("dots-menu").parentElement.dataset.index)
 	})
 	title_edit.addEventListener('click', () => {
 		const new_title_name = input_new_title_name()
-		if (new_title_name != null) { wordbook_data[document.getElementById("dots_menu").parentElement.dataset.index].name = new_title_name }
+		if (new_title_name != null) {
+			wordbook_data[document.getElementById("dots-menu").parentElement.dataset.index].name = new_title_name
+			save_wordbook_data()
+		}
 		display_title()
 	})
 	words_edit.addEventListener('click', () => {
-		edit_words(document.getElementById("dots_menu").parentElement.dataset.index)
+		edit_words(document.getElementById("dots-menu").parentElement.dataset.index)
 	})
 	title_remove.addEventListener('click', () => {
 		dialog({ title: "注意", content: "削除します。よろしいですか?", button: ["キャンセル", "削除"] }).then((resolve) => {
 			if (resolve == 1) {
-				delete wordbook_data[document.getElementById("dots_menu").parentElement.dataset.index]
+				obj_manip.remove(wordbook_data, [document.getElementById("dots-menu").parentElement.dataset.index])
+				save_wordbook_data()
 				display_title()
 			}
 		})
@@ -321,8 +349,11 @@ function dots_click(e) {
 
 function add_new_title() {
 	const new_title_name = input_new_title_name()
-	if (new_title_name != null) { wordbook_data.push({ name: new_title_name, words: [] }) }
-	display_title()
+	if (new_title_name != null) {
+		wordbook_data.push({ name: new_title_name, words: [] })
+		save_wordbook_data()
+	}
+	edit_words(wordbook_data.length - 1)
 }
 
 function input_new_title_name() {
@@ -333,4 +364,7 @@ function input_new_title_name() {
 	return new_title_name
 }
 
+function save_wordbook_data() {
+	storage.set(storage_key, wordbook_data)
+}
 /* --------------------------------------------------------------------------------------------- */
