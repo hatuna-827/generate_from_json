@@ -8,7 +8,7 @@
 import data from "./data.json" with {type: "json"}
 let list = data.list
 let now_index = 8
-let index_box = document.getElementById("index_box")
+let index_box = document.getElementById("index-box")
 for (let i = 0; i < now_index; i++) {
 	add_line(i, "end")
 }
@@ -34,14 +34,14 @@ function add_line(i, where) {
 
 function add(i, where) {
 	i %= list.length
-	let new_a = document.createElement("a")
-	let new_div = document.createElement("div")
-	let new_p = document.createElement("p")
-	new_p.textContent = list[i].index
-	if (where == "begin") { index_box.insertAdjacentElement("afterbegin", new_a) }
-	if (where == "end") { index_box.insertAdjacentElement("beforeend", new_a) }
-	new_a.appendChild(new_div)
-	new_div.appendChild(new_p)
+	let box = document.createElement("div")
+	box.className = "box"
+	let text = document.createElement("p")
+	text.className = "text"
+	text.textContent = list[i].index
+	if (where == "begin") { index_box.insertAdjacentElement("afterbegin", box) }
+	if (where == "end") { index_box.insertAdjacentElement("beforeend", box) }
+	box.appendChild(text)
 }
 
 function remove_line(where) {
